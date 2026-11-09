@@ -1,0 +1,11 @@
+# Logs locais de execução
+logs/
+
+# Nunca versionar credenciais (ficam em ~/.kettle/kettle.properties, fora deste repo)
+kettle.properties
+*.properties.local
+
+# Arquivos temporários do Pentaho
+*.bak
+*~
+.DS_Store

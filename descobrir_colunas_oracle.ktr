@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  descobrir_colunas_oracle.ktr
+  Lista as colunas das tabelas do schema TUP no Oracle (RJPO1DR) que o usuário
+  RJPO1DR_USER do kettle.properties consegue ler, uma por linha:
+    TABELA;COLUNA;TIPO;TAMANHO;NULLABLE
+  Serve para conferir o acesso e montar o DDL de tabelas novas (ex.: CID).
+
+  Uso via pan.sh:
+    pan.sh -file=descobrir_colunas_oracle.ktr -param:OUTPUT_FILE=/tmp/colunas_tup.txt
+-->
+<transformation>
+  <info>
+    <name>descobrir_colunas_oracle</name>
+    <description>Lista as colunas do schema TUP visíveis para o usuário e grava em arquivo</description>
+    <extended_description/>
+    <trans_version>1.0</trans_version>
+    <trans_type>Normal</trans_type>
+    <parameters>
+      <parameter>
+        <name>OUTPUT_FILE</name>
+        <default_value>/tmp/colunas_tup.txt</default_value>
+        <description>Caminho absoluto do arquivo de saída</description>
+      </parameter>
+    </parameters>
+    <log>
+      <trans-log-table>
+        <connection/>
+        <schema/>
+        <table/>
+        <size_limit_lines/>
+        <interval/>
+        <timeout_days/>
+        <field>
+          <id>ID_BATCH</id>
+          <enabled>Y</enabled>
+          <name>ID_BATCH</name>
+        </field>
+        <field>
+          <id>CHANNEL_ID</id>
+          <enabled>Y</enabled>
+          <name>CHANNEL_ID</name>
+        </field>
+        <field>
+          <id>TRANSNAME</id>
+          <enabled>Y</enabled>
+          <name>TRANSNAME</name>
+        </field>
+        <field>
+          <id>STATUS</id>
+          <enabled>Y</enabled>
+          <name>STATUS</name>
+        </field>
+        <field>
+          <id>LINES_READ</id>
+          <enabled>Y</enabled>
+          <name>LINES_READ</name>
+        </field>
+        <field>
+          <id>LINES_WRITTEN</id>
+          <enabled>Y</enabled>
+          <name>LINES_WRITTEN</name>
+        </field>
+        <field>
+          <id>LINES_UPDATED</id>
+          <enabled>Y</enabled>
+          <name>LINES_UPDATED</name>
+        </field>
+        <field>
+          <id>LINES_INPUT</id>
+          <enabled>Y</enabled>
+          <name>LINES_INPUT</name>
+        </field>
+        <field>
+          <id>LINES_OUTPUT</id>
+          <enabled>Y</enabled>
+          <name>LINES_OUTPUT</name>
+        </field>
+        <field>
+          <id>LINES_REJECTED</id>
+          <enabled>Y</enabled>
+          <name>LINES_REJECTED</name>
+        </field>
+        <field>
+          <id>ERRORS</id>
+          <enabled>Y</enabled>
+          <name>ERRORS</name>
+        </field>
+        <field>
+          <id>STARTDATE</id>
+          <enabled>Y</enabled>
+          <name>STARTDATE</name>
+        </field>
+        <field>
+          <id>ENDDATE</id>
+          <enabled>Y</enabled>
+          <name>ENDDATE</name>
+        </field>
+        <field>
+          <id>LOGDATE</id>
+          <enabled>Y</enabled>
+          <name>LOGDATE</name>
+        </field>
+        <field>
+          <id>DEPDATE</id>
+          <enabled>Y</enabled>
+          <name>DEPDATE</name>
+        </field>
+        <field>
+          <id>REPLAYDATE</id>
+          <enabled>Y</enabled>
+          <name>REPLAYDATE</name>
+        </field>
+        <field>
+          <id>LOG_FIELD</id>
+          <enabled>N</enabled>
+          <name>LOG_FIELD</name>
+        </field>
+      </trans-log-table>
+    </log>
+    <maxdate/>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <step_performance_capturing_size_limit>100</step_performance_capturing_size_limit>
+    <dependencies/>
+    <partitionschemas/>
+    <slaveservers/>
+    <clusterschemas/>
+    <modified_user>-</modified_user>
+    <modified_date>2026/09/01 00:00:00.000</modified_date>
+  </info>
+
+  <!-- ================================================================
+       CONEXÃO: Oracle RJPO1DR (usuário RJPO1DR_USER, o mesmo do CNES e do DBGERAL) — credenciais via kettle.properties
+       ================================================================ -->
+  <connection>
+    <name>RJPO1DR</name>
+    <server/>
+    <type>ORACLE</type>
+    <access>Native</access>
+    <database>${RJPO1DR_TNS}</database>
+    <port>-1</port>
+    <username>${RJPO1DR_USER}</username>
+    <password>${RJPO1DR_PASSWORD}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_LOWERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_UPPERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_BOOLEAN_DATA_TYPE</code>
+        <attribute>N</attribute>
+      </attribute>
+    </attributes>
+  </connection>
+
+  <!-- ================================================================
+       STEPS
+       ================================================================ -->
+  <step>
+    <name>Colunas TUP Oracle</name>
+    <type>TableInput</type>
+    <description>Colunas das tabelas do schema TUP em ALL_TAB_COLUMNS</description>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>RJPO1DR</connection>
+    <sql>SELECT table_name || ';' || column_name || ';' || data_type || ';' || data_length || ';' || nullable AS linha FROM all_tab_columns WHERE owner = 'TUP' ORDER BY table_name, column_id</sql>
+    <limit>0</limit>
+    <lookup/>
+    <!-- CRÍTICO: variables_active=Y para substituição de ${VARIAVEL} -->
+    <execute_each_row>N</execute_each_row>
+    <variables_active>Y</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <GUI>
+      <xloc>192</xloc>
+      <yloc>160</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+
+  <step>
+    <name>Grava arquivo OUTPUT_FILE</name>
+    <type>TextFileOutput</type>
+    <description>Grava MAX_CMP no arquivo informado via parâmetro OUTPUT_FILE</description>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <!-- ${OUTPUT_FILE} é resolvido via parâmetro passado ao pan.sh -->
+    <file>
+      <name>${OUTPUT_FILE}</name>
+      <servlet_output>N</servlet_output>
+      <do_not_open_new_file_init>N</do_not_open_new_file_init>
+      <extention/>
+      <append>N</append>
+      <split>N</split>
+      <haspartno>N</haspartno>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <SpecifyFormat>N</SpecifyFormat>
+      <date_time_format/>
+      <create_parent_folder>N</create_parent_folder>
+      <add_ending_line_of_file/>
+      <split_every/>
+      <rotation_size/>
+    </file>
+    <encoding>UTF-8</encoding>
+    <endedLine/>
+    <header>N</header>
+    <footer>N</footer>
+    <format>UNIX</format>
+    <compression>None</compression>
+    <separator/>
+    <enclosure/>
+    <enclosure_forced>N</enclosure_forced>
+    <enclosure_fix_disabled>N</enclosure_fix_disabled>
+    <pad>N</pad>
+    <fast_dump>N</fast_dump>
+    <add_to_result_filenames>N</add_to_result_filenames>
+    <fields>
+      <field>
+        <name>linha</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+    </fields>
+    <GUI>
+      <xloc>448</xloc>
+      <yloc>160</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+
+  <!-- ================================================================
+       HOPS
+       ================================================================ -->
+  <order>
+    <hop>
+      <from>Colunas TUP Oracle</from>
+      <to>Grava arquivo OUTPUT_FILE</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+
+  <step_error_handling/>
+  <slave-step-copy-partition-distribution/>
+  <slave_transformation>N</slave_transformation>
+</transformation>
