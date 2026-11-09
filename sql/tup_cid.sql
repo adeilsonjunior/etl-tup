@@ -67,23 +67,25 @@ CREATE TABLE IF NOT EXISTS tup.tb_cid_subcategoria (
 CREATE INDEX IF NOT EXISTS idx_tb_cid_categoria_co    ON tup.tb_cid_categoria (co_cid_categoria);
 CREATE INDEX IF NOT EXISTS idx_tb_cid_subcategoria_co ON tup.tb_cid_subcategoria (co_cid_subcategoria);
 
--- Formato de sigtap.tb_cid: categorias (3 caracteres, ex.: A33) e subcategorias (4, ex.: A330).
+-- Formato de sigtap.tb_cid: um registro por código, de 3 caracteres (ex.: A33) ou 4 (ex.: A330).
+-- O TUP já traz os códigos de 3 caracteres também em tb_cid_subcategoria (com sexo e agravo):
+-- vale a subcategoria; a categoria só entra quando o código não existe como subcategoria.
 -- Inclui os códigos excluídos (fl_excluido = true), para ocorrências antigas não perderem a descrição.
--- Categoria não tem sexo nem agravo no TUP: ficam nulos.
 CREATE OR REPLACE VIEW tup.vw_cid AS
-SELECT c.co_cid_categoria       AS co_cid,
-       c.no_cid_categoria       AS no_cid,
-       NULL::char(1)            AS tp_sexo,
-       NULL::char(1)            AS tp_agravo,
-       (c.dt_exclusao IS NOT NULL) AS fl_excluido
-  FROM tup.tb_cid_categoria c
-UNION ALL
-SELECT s.co_cid_subcategoria,
-       s.no_cid_subcategoria,
+SELECT s.co_cid_subcategoria        AS co_cid,
+       s.no_cid_subcategoria        AS no_cid,
        s.tp_sexo,
        s.tp_agravo,
-       (s.dt_exclusao IS NOT NULL)
-  FROM tup.tb_cid_subcategoria s;
+       (s.dt_exclusao IS NOT NULL)  AS fl_excluido
+  FROM tup.tb_cid_subcategoria s
+UNION ALL
+SELECT c.co_cid_categoria,
+       c.no_cid_categoria,
+       NULL::char(1),
+       NULL::char(1),
+       (c.dt_exclusao IS NOT NULL)
+  FROM tup.tb_cid_categoria c
+ WHERE NOT EXISTS (SELECT 1 FROM tup.tb_cid_subcategoria s WHERE s.co_cid_subcategoria = c.co_cid_categoria);
 
 COMMENT ON VIEW tup.vw_cid IS
     'CIDs do TUP no formato de sigtap.tb_cid: categorias (3 caracteres) e subcategorias (4). Carga diária pelo job tup (etl-tup).';
@@ -92,5 +94,7 @@ COMMIT;
 
 -- Conferência (depois da carga):
 --   SELECT length(co_cid), count(*), count(*) FILTER (WHERE fl_excluido) FROM tup.vw_cid GROUP BY 1;
+--   -- Código repetido (deve vir 0):
+--   SELECT count(*) FROM (SELECT co_cid FROM tup.vw_cid GROUP BY 1 HAVING count(*) > 1) x;
 --   -- CIDs do sigtap que não estão no TUP (deve vir vazio ou quase):
 --   SELECT s.co_cid FROM sigtap.tb_cid s LEFT JOIN tup.vw_cid t ON t.co_cid = s.co_cid WHERE t.co_cid IS NULL LIMIT 20;
