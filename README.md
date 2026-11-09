@@ -21,8 +21,8 @@ Tabelas, na ordem do job: `tb_grupo`, `tb_sub_grupo`, `tb_forma_organizacao`, `t
 `th_procedimento`, `tb_detalhe`, `rl_procedimento_detalhe`, `tb_regra_condicionada`,
 `rl_procedimento_regra_cond`.
 
-Credenciais: `/home/ec2-user/.kettle/kettle.properties` (`DBCA_*`, `RJPO1DR_TNS`, `RJPO1DR_USER`,
-`RJPO1DR_PASSWORD`), as mesmas do CNES e do DBGERAL.
+Credenciais: `/home/ec2-user/.kettle/kettle.properties` (`DBCA_*`, `RJPO1DR_TNS`, `RJPO1DR_SIA_USER`,
+`RJPO1DR_SIA_PASSWORD`): o usuário SUS360, o mesmo do SIA e do SIH, que tem leitura no schema TUP.
 
 ## Deploy no servidor (10.60.67.173)
 

@@ -493,8 +493,8 @@
     <access>Native</access>
     <database>${RJPO1DR_TNS}</database>
     <port>-1</port>
-    <username>${RJPO1DR_USER}</username>
-    <password>${RJPO1DR_PASSWORD}</password>
+    <username>${RJPO1DR_SIA_USER}</username>
+    <password>${RJPO1DR_SIA_PASSWORD}</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
